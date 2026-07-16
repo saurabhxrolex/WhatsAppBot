@@ -41,3 +41,41 @@ async function checkMessage(sock, msg) {
 
   if (config.IGNORE_OWNER && sender === config.OWNER) return;
   if (config.IGNORE_ADMINS && admins.includes(sender)) return;
+  let violated = false;
+
+  if (config.ANTILINK && containsLink(text)) {
+    violated = true;
+  }
+
+  if (config.ANTIBADWORD && containsBadWord(text)) {
+    violated = true;
+  }
+
+  if (!violated) return;
+
+  if (config.AUTO_DELETE) {
+    await sock.sendMessage(group, {
+      delete: msg.key
+    });
+  }
+
+  const warning = addWarning(sender);
+
+  await sock.sendMessage(group, {
+    text: `⚠️ @${sender.split("@")[0]} Warning ${warning}/${config.WARNING_LIMIT}`,
+    mentions: [sender]
+  });
+
+  if (config.AUTO_KICK && warning >= config.WARNING_LIMIT) {
+    await sock.groupParticipantsUpdate(group, [sender], "remove");
+    warnings.delete(sender);
+  }
+}
+
+module.exports = {
+  containsBadWord,
+  containsLink,
+  addWarning,
+  warnings,
+  checkMessage
+};
