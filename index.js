@@ -7,7 +7,7 @@ const {
 
 const pino = require("pino");
 const QRCode = require("qrcode-terminal");
-
+const { checkMessage } = require("./moderation");
 async function startBot() {
   const { state, saveCreds } = await useMultiFileAuthState("./session");
   const { version } = await fetchLatestBaileysVersion();
@@ -56,7 +56,7 @@ async function startBot() {
 
     if (!msg.message) return;
     if (msg.key.fromMe) return;
-
+await checkMessage(sock, msg);
     const from = msg.key.remoteJid;
 
     const body =
