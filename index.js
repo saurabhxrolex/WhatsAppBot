@@ -13,6 +13,14 @@ async function startBot() {
   const { version } = await fetchLatestBaileysVersion();
 
   const sock = makeWASocket({
+    const phoneNumber = "918601322748"; // Apna number country code ke saath
+
+if (!state.creds.registered) {
+  const code = await sock.requestPairingCode(phoneNumber);
+  console.log("\n==========================");
+  console.log("PAIRING CODE:", code);
+  console.log("==========================\n");
+}
     version,
     auth: state,
     logger: pino({ level: "silent" }),
@@ -25,11 +33,7 @@ async function startBot() {
   sock.ev.on("connection.update", async (update) => {
     const { connection, qr, lastDisconnect } = update;
 
-    if (qr) {
-      console.clear();
-      console.log("📱 Scan QR Code");
-      QRCode.generate(qr, { small: true });
-    }
+    
 
     if (connection === "open") {
       console.log("✅ Bot Connected");
